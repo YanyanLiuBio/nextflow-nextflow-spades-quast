@@ -6,6 +6,8 @@ include { QUAST } from './modules/quast.nf'
 include { SUMMARIZE_QUAST } from './modules/summarize_quast.nf'
 include { BBREPAIR } from './modules/bbrepair.nf'
 include { FASTP } from './modules/fastp.nf'
+include { BUSCO } from './modules/busco.nf'
+include { SUMMARIZE_BUSCO } from './modules/summarize_busco.nf'
 
 params.s3_path = "seqwell-users/yanyan/quast_admera/50x/"
 
@@ -28,7 +30,7 @@ workflow {
         fq2 = pair[2]
 
         // Extract the part after the last '-' and before '_S'
-    def base = sample_id.tokenize('_')[0]  // e.g. "Ecoli_HS_H07"
+    def base = sample_id.tokenize('.')[0]  // e.g. "Ecoli_HS_H07"
     def well = base.tokenize('_')[2]      // e.g. "H07"
 
 
@@ -72,8 +74,14 @@ workflow {
 
     // ==== 8. Summarize QUAST ====
     SUMMARIZE_QUAST(QUAST.out.report.collect())
+    
+    // ==== 9. Run  BUSCO ====
+    BUSCO(assembled.fa)
 
-    // ==== 9. Workflow event handlers ====
+    // ==== 10. Summarize  BUSCO ====
+    SUMMARIZE_BUSCO(BUSCO.out.busco_report.collect())
+
+    // ==== 11. Workflow event handlers ====
     workflow.onComplete = {
         println "Pipeline completed at: $workflow.complete"
         println "Pipeline completed time duration: $workflow.duration"
