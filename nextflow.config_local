@@ -18,7 +18,7 @@ params {
   dev = false
   number_of_inputs = 2
   sample_map = null
-  s3_path = { params.dev ? "seqwell-dev/analysis" : "seqwell-analysis" }()
+  s3_path = { params.dev ? "seqwell-analysis" : "seqwell-dev/analysis" }()
 }
 
 

@@ -6,7 +6,7 @@
 set -euo pipefail
 
 analysis_info=$1
-output=${analysis_info}"busco_summary.csv"
+output="busco_summary_${analysis_info}.csv"
 
 # Print CSV header
 echo "lineage,sample_ID,Complete_Percent,Single_Copy_Percent,Duplicated_Percent,Fragmented_Percent,Missing_Percent,Total_BUSCOs,Complete_Count,Single_Copy_Count,Duplicated_Count,Fragmented_Count,Missing_Count,Total_Searched,Num_Scaffolds,Num_Contigs,Total_Length,Percent_Gaps,Scaffold_N50,Contig_N50" >>  $output
