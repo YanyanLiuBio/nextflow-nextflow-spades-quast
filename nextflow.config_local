@@ -25,15 +25,15 @@ params {
 
 process { 
            withName: 'DOWNSAMPLE' {
-                executor = 'awsbatch'
+                executor = 'local'
                 container = 'cautree/seqtk:latest'
                 memory = 6.GB
                 queue = 'spot_low_priority'
                 cpus = 2
             }
 
-            withName: 'FASTP' {
-                executor = 'awsbatch'
+             withName: 'FASTP' {
+                executor = 'local'
                 container = 'seqwell/fastp:v0.20.1_cv1'
                 memory = 6.GB
                 queue = 'spot_low_priority'
@@ -41,7 +41,7 @@ process {
             }
             
             withName: 'BBREPAIR' {
-                executor = 'awsbatch'
+                executor = 'local'
                 container = 'seqwell/fq_assemble:v1.0'
                 memory = 6.GB
                 queue = 'spot_low_priority'
@@ -49,43 +49,43 @@ process {
             }
   
             withName: 'SPADES' {
-                executor = 'awsbatch'
+                executor = 'local'
                 container = 'cautree/spades:latest'
                 cpus = 8
                 memory = 30.GB
-                queue = 'spot_low_priority'
+                queue = 'nextflow-20231220-cpu8-mem32-disk200'
                 
             }
             
             
             withName: 'QUAST' {
-                executor = 'awsbatch'
+                executor = 'local'
                 container = 'cautree/quast:latest'
                 memory = 6.GB
-                cpus = 2
+                cpus = 8
                 queue = 'spot_low_priority'
                 
             }
             
            
             withName: 'SUMMARIZE_QUAST' {
-                executor = 'awsbatch'
+                executor = 'local'
                 container = 'cautree/awk_sed:latest'
                 memory = 6.GB
                 queue = 'spot_low_priority'
                 
             }
 
-
-            withName: 'SUMMARIZE_BUSCO' {
-                executor = 'awsbatch'
+           withName: 'SUMMARIZE_BUSCO' {
+                executor = 'local'
                 container = 'cautree/awk_sed:latest'
                 memory = 6.GB
                 queue = 'spot_low_priority'
 
             }
+
             withName: 'BUSCO' {
-                executor = 'awsbatch'
+                executor = 'local'
                 container = 'seqwell/busco:5.7.1'
                 memory = 15.GB
                 cpus = 4

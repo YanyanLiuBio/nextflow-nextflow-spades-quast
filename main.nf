@@ -9,62 +9,47 @@ include { FASTP } from './modules/fastp.nf'
 include { BUSCO } from './modules/busco.nf'
 include { SUMMARIZE_BUSCO } from './modules/summarize_busco.nf'
 
-params.s3_path = "seqwell-users/yanyan/quast_admera/50x/"
+
 
 workflow {
 
-    // ==== 1. Ensure downsample_map param is provided ====
-    if ( !params.downsample_map ) {
-        error "Missing required parameter: --downsample_map"
+    // ==== 1. Ensure sample_map param is provided ====
+    if ( !params.sample_map ) {
+        error "Missing required parameter: --sample_map"
     }
 
-    // ==== 2. Load FASTQ pairs with (well, sample_id, fq1, fq2) ====
+    // ==== 2. Load FASTQ pairs with (sample_id, fq1, fq2) ====
     fq = Channel.fromFilePairs(
         "s3://seqwell-fastq/${params.run}/{${params.plates}}/*_R{1,2}_001.fastq.gz", 
         flat: true,
         checkIfExists: true
     )
-    .map { pair ->
-        sample_id = pair[0]
-        fq1 = pair[1]
-        fq2 = pair[2]
-
-        // Extract the part after the last '-' and before '_S'
-    def base = sample_id.tokenize('.')[0]  // e.g. "Ecoli_HS_H07"
-    def well = base.tokenize('_')[2]      // e.g. "H07"
-
-
-        [ well, sample_id, fq1, fq2 ]
-    }
     .take(params.dev ? params.number_of_inputs : -1)
      
-//     fq.view()
+     //fq.view()
 
-     fq
-    .collect()
-    .view { it.size() }
+     fq.collect().view { it.size() }
 
    fastp_fq = FASTP(fq)
    bbrepair_fq = BBREPAIR(fastp_fq)
 
-    // ==== 3. Load downsample_map as (well, depth, ref_path) ====
+    // ==== 3. Load downsample_map as (sample_id, ref) ====
     meta = Channel
-        .fromPath(params.downsample_map)
+        .fromPath(params.sample_map)
         .splitCsv(header: true)
         .map { row -> 
-            well = row.well
+            well = row.sample_id
             ref_raw = row.ref ?: ""
             ref_path = ref_raw ? "s3://seqwell-ref/${ref_raw}.fa" : ""
             [ well, ref_path ] 
         }
-  //  meta.view()
-    meta
-    .collect()
-    .view { it.size() }
-    // ==== 4. Join FASTQ with metadata → (well, sample_id, fq1, fq2, depth, ref_path) ====
-    fq_with_meta = bbrepair_fq.join(meta, by: 0)
+    //meta.view()
+    meta.collect().view { it.size() }
 
-    fq_with_meta.view()
+    // ==== 4. Join FASTQ with metadata → (sample_id, fq1, fq2, depth, ref_path) ====
+    fq_with_meta = bbrepair_fq.join(meta, by: 0)
+                   
+    //fq_with_meta.view()
   
     // ==== 6. Run SPADES ====
     assembled = SPADES( fq_with_meta )
@@ -74,7 +59,8 @@ workflow {
 
     // ==== 8. Summarize QUAST ====
     SUMMARIZE_QUAST(QUAST.out.report.collect())
-    
+
+
     // ==== 9. Run  BUSCO ====
     BUSCO(assembled.fa)
 

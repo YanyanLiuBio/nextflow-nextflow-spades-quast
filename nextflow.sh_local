@@ -9,8 +9,7 @@ number_of_inputs=2
 
 
 /software/nextflow-align/nextflow run main.nf \
--c nextflow.config \
--work-dir  s3://seqwell-analysis/${run}/${analysis}/work \
+-c nextflow.config_local \
 --analysis $analysis \
 --run $run \
 --plates $plates \
