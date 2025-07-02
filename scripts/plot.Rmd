@@ -1,0 +1,95 @@
+
+
+```{r}
+
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(ggrepel)  # for better label placement
+
+# --- 1. Load data ---
+df <- read_csv("busco_summary_20250627_NextSeq2000_Salmonella_spades_busco.csv")
+
+# --- 2. Prepare data ---
+df <- df %>%
+  mutate(
+    sample_ID = str_trim(sample_ID),
+    type = if_else(str_detect(sample_ID, "HS"), "HS", "Std"),
+    well = str_extract(sample_ID, "[A-H]\\d{2}")
+  )
+
+# --- 3. Plot with ggrepel ---
+ggplot(df, aes(x = Num_Contigs, y = Contig_N50, color = type)) +
+  geom_jitter(width = 10, height = 5000, size = 3, alpha = 0.8) +
+  geom_text_repel(
+    aes(label = well),
+    size = 3.5,
+    box.padding = 0.5,
+    point.padding = 0.5,
+    segment.color = "grey50",
+    max.overlaps = Inf
+  ) +
+  scale_color_manual(values = c("HS" = "steelblue", "Std" = "darkorange")) +
+  labs(
+    title = "Salmonella Contig N50 vs Number of Contigs",
+    x = "Number of Contigs",
+    y = "Contig N50 (bp)",
+    color = "Sample Type"
+  ) +
+  theme_minimal(base_size = 14)
+
+# --- 5. Save wider image to file ---
+ggsave("Salmonella_N50_vs_numbers_of_contigs.jpg")
+
+
+```
+
+
+
+
+
+```{r}
+
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(ggrepel)  # for better label placement
+
+# --- 1. Load data ---
+df <- read_csv("busco_summary_20250627_NextSeq2000_Ecoli_spades_busco.csv")
+
+# --- 2. Prepare data ---
+df <- df %>%
+  mutate(
+    sample_ID = str_trim(sample_ID),
+    type = if_else(str_detect(sample_ID, "HS"), "HS", "Std"),
+    well = str_extract(sample_ID, "[A-H]\\d{2}")
+  )
+
+# --- 3. Plot with ggrepel ---
+ggplot(df, aes(x = Num_Contigs, y = Contig_N50, color = type)) +
+  geom_jitter(width = 10, height = 5000, size = 3, alpha = 0.8) +
+  geom_text_repel(
+    aes(label = well),
+    size = 3.5,
+    box.padding = 0.5,
+    point.padding = 0.5,
+    segment.color = "grey50",
+    max.overlaps = Inf
+  ) +
+  scale_color_manual(values = c("HS" = "steelblue", "Std" = "darkorange")) +
+  labs(
+    title = "Ecoli Contig N50 vs Number of Contigs",
+    x = "Number of Contigs",
+    y = "Contig N50 (bp)",
+    color = "Sample Type"
+  ) +
+  theme_minimal(base_size = 14)
+
+# --- 5. Save wider image to file ---
+ggsave("Ecoli_N50_vs_numbers_of_contigs.jpg")
+
+
+```
