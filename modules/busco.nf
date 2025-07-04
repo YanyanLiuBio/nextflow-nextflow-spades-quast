@@ -1,6 +1,6 @@
-process BUSCO {
+BUSCO {
     tag "$sample_ID"
-   // publishDir path: "busco", mode: 'copy'
+    // publishDir path: "busco", mode: 'copy'
     publishDir path: "s3://${params.s3_path}/${params.run}/${params.analysis}/BUSCO", pattern: '*busco.txt', mode: 'copy'
     
     input:
@@ -16,28 +16,37 @@ process BUSCO {
     
     # Determine most specific BUSCO lineage
     case "\$ref_basename" in
-        "Saccharomyces_cerevisiae")
-            busco_lineage="fungi_odb10"
-            ;;
-        "Escherichia_coli"|"Klebsiella"*|"Ecoli"*|"Salmonella"*|"Enterobacter"*|"Shigella"*)
-            busco_lineage="enterobacterales_odb10"
-            ;;
-        "Pseudomonas"*)
-            busco_lineage="pseudomonadales_odb10"
-            ;;
-        "Staphylococcus"*)
+        "Bacillus_cereus"|"Bacillus_subtilis")
             busco_lineage="bacillales_odb10"
             ;;
-        "Streptococcus"*|"Lactobacillus"*)
-            busco_lineage="lactobacillales_odb10"
+        "Clostridioides_difficile")
+            busco_lineage="clostridia_odb10"
             ;;
-        "Mycobacterium"*)
-            busco_lineage="actinobacteria_odb10"
+        "Enterobacter_cloacae")
+            busco_lineage="enterobacterales_odb10"
+            ;;
+        "Escherichia_coli-K12_ATCC"|"Ecoli"*)
+            busco_lineage="enterobacterales_odb10"
+            ;;
+        "Pseudomonas_aeruginosa")
+            busco_lineage="gammaproteobacteria_odb10"
+            ;;
+        "Rhodobacter_sphaeroides")
+            busco_lineage="alphaproteobacteria_odb10"
+            ;;
+        "Saccharomyces_cerevisiae")
+            busco_lineage="saccharomycetes_odb10" 
+            ;;
+        "Staphylococcus_epidermidis")
+            busco_lineage="bacillales_odb10"
+            ;;
+        "Shigella"*)
+            busco_lineage="enterobacterales_odb10"
+            ;;
+        "Salmonella"*)
+            busco_lineage="enterobacterales_odb10"
             ;;
         *)
-            # Fallback to broad bacterial lineage
-            busco_lineage="bacteria_odb10"
-            ;;
     esac
     
     busco -i ${fa} -l \$busco_lineage -o ${sample_ID}_busco -m genome --cpu ${task.cpus}
