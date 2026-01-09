@@ -9,7 +9,7 @@ by Yanyan Liu
 
 ## what for
 This is the nextflow pipeline that does bacteria genome assembly using spades. 
-The assembly metrics are collected by QUAST. BUSCO metrics is also produced.
+The assembly metrics are collected by QUAST. 
 It is currently does not have the downsample option.
 
 ## how to run
@@ -18,16 +18,15 @@ It is currently does not have the downsample option.
 ```
 #!/bin/bash
 
-run=20250627_NextSeq2000
-plates=Ecoli_*_FASTQ
-sample_map=ecoli_samples_map.csv
-analysis=Ecoli_spades_busco
-
+run=20251218_MiSeqi100-Morty
+plates=REL_25J-B_FASTQ
+sample_map=ecoli_map_run_20251218_MiSeqi100_Morty.csv
+analysis=Ecoli_spades_test
 
 
 /software/nextflow-align/nextflow run \
-/software/nextflow-spades-quast/main.nf \
--work-dir  s3://seqwell-analysis/${run}/${analysis}/work \
+/software/nextflow-assembly-spades/main.nf \
+-work-dir s3://seqwell-analysis/$run/$analysis/work \
 --analysis $analysis \
 --run $run \
 --plates $plates \
@@ -43,15 +42,16 @@ analysis=Ecoli_spades_busco
 ### 3.sample map example and requirement
 ```
 sample_id,ref
-Ecoli_Std_A04,Ecoli_SAMN07731009_gcf
-Ecoli_Std_B04,Ecoli_SAMN07731009_gcf
-Ecoli_Std_C04,Ecoli_SAMN07731009_gcf
-Ecoli_Std_D04,Ecoli_SAMN07731009_gcf
-Ecoli_Std_E04,Ecoli_SAMN07731009_gcf
-Ecoli_Std_F04,Ecoli_SAMN07731009_gcf
-Ecoli_Std_G04,Ecoli_SAMN07731009_gcf
-Ecoli_Std_H04,Ecoli_SAMN07731009_gcf
+REL_25J-B_A08,ecoli_REL606
+REL_25J-B_B08,ecoli_REL606
+REL_25J-B_C08,ecoli_REL606
+REL_25J-B_D08,ecoli_REL606
+REL_25J-B_E08,ecoli_REL606
+REL_25J-B_F08,ecoli_REL606
+REL_25J-B_G08,ecoli_REL606
+REL_25J-B_H08,ecoli_REL606
 ```
 
 - The sample map needs two columns, with the right header: *sample_id* and *ref*
-- For sample_id, it needs to be matched to the fastq file names. For example, if the fastq file is Ecoli_HS_H07_R1_001.fastq.gz and Ecoli_HS_H07_R2_001.fastq.gz. The sample_id will be *Ecoli_HS_H07*
+- For sample_id, it needs to be matched to the fastq file names. 
+For example, if the fastq file is REL_25J-B_A08_R1_001.fastq.gz and REL_25J-B_A08_R2_001.fastq.gz. The sample_id will be *REL_25J-B_A08*
